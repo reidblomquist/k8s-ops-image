@@ -10,6 +10,21 @@ dpl ?= deploy.env
 include $(dpl)
 export $(shell sed 's/=.*//' $(dpl))
 
+# import build config
+bcf ?= build.env
+include $(bcf)
+export $(shell sed 's/=.*//' $(bcf))
+BUILD_ARGS = $(shell grep -v '^\#' $(bcf) | sed ':a;N;$$!ba;s/\n/ --build-arg /g')
+
+# generate base build command(s)
+CMD_BUILD := "eval $$\( docker build"
+CMD_BUILD += " --build-arg $(BUILD_ARGS)"
+CMD_BUILD += " -t $(APP_NAME) .\)"
+
+CMD_BUILD_NC := "eval $$\( docker build"
+CMD_BUILD_NC += " --build-arg $(BUILD_ARGS)"
+CMD_BUILD_NC += " --no-cache -t $(APP_NAME) .\)"
+
 # grep the version from the mix file
 VERSION=$(shell ./version.sh)
 
@@ -28,16 +43,10 @@ help: ## This help.
 # DOCKER TASKS
 # Build the container
 build: ## Build the container
-	docker build \
-	--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-	--build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
-	-t $(APP_NAME) .
+	@eval $(CMD_BUILD)
 
 build-nc: ## Build the container without caching
-	docker build \
-	--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-	--build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
-	--no-cache -t $(APP_NAME) .
+	@eval $(CMD_BUILD_NC)
 
 run: ## Run container on port configured in `config.env`
 	docker run -i -t --rm --env-file=./config.env -p=$(PORT):$(PORT) --name="$(APP_NAME)" $(APP_NAME)
