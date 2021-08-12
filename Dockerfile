@@ -30,5 +30,4 @@ RUN wget -q https://github.com/Azure/kubelogin/releases/download/v${KUBELOGIN_VE
     && unzip kubelogin-linux-amd64.zip \
     && mv ./bin/linux_amd64/kubelogin /usr/local/bin/ \
     && chmod +x /usr/local/bin/kubelogin \
-    && rm -rf ./kubelogin-linux-amd64.zip \
-    && rm -rf ./bin
+    && rm -rf ./kubelogin-linux-amd64.zip
