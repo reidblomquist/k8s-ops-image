@@ -28,10 +28,16 @@ help: ## This help.
 # DOCKER TASKS
 # Build the container
 build: ## Build the container
-	docker build -t $(APP_NAME) .
+	docker build \
+	--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+	--build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
+	-t $(APP_NAME) .
 
 build-nc: ## Build the container without caching
-	docker build --no-cache -t $(APP_NAME) .
+	docker build \
+	--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+	--build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
+	--no-cache -t $(APP_NAME) .
 
 run: ## Run container on port configured in `config.env`
 	docker run -i -t --rm --env-file=./config.env -p=$(PORT):$(PORT) --name="$(APP_NAME)" $(APP_NAME)
@@ -79,8 +85,10 @@ endif
 CMD_REPOLOGIN += " get-login --no-include-email \)"
 
 # login to AWS-ECR
-repo-login: ## Auto login to AWS-ECR unsing aws-cli
-	@eval $(CMD_REPOLOGIN)
+#repo-login: ## Auto login to AWS-ECR unsing aws-cli
+#	@eval $(CMD_REPOLOGIN)
+repo-login: ## login to dockerhub
+	@eval "docker login"
 
 version: ## Output the current version
 	@echo $(VERSION)

@@ -1,11 +1,11 @@
-ARG ALPINE_VER=3.12
-ARG KUBECTL_VER=1.18.0
+ARG BASE_IMAGE_TAG=3.12
 
-FROM alpine:$ALPINE_VER
+FROM alpine:$BASE_IMAGE_TAG
 
-ADD config.env /
+# Make sure in-image args are defined after base
+ARG KUBECTL_VERSION=1.22.0
 
-ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VER}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
+ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 
 RUN chmod +x /usr/local/bin/kubectl
 
